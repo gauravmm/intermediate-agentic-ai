@@ -139,9 +139,10 @@
   ]
 ]
 
-// A full pattern slide body: diagram + caption on the left, helps column on the
-// right, source terms along the bottom. Drop in under a `==` slide heading.
-#let pattern-slide(diagram, caption, applies, anthropic, openai) = {
+// A full pattern slide body: caption + diagram + a real-world example on the
+// left, helps column on the right, source terms along the bottom. Drop in under
+// a `==` slide heading.
+#let pattern-slide(diagram, caption, example, applies, anthropic, openai) = {
   grid(
     columns: (1fr, auto),
     column-gutter: 1.5em,
@@ -151,6 +152,15 @@
       #caption
       #v(1fr)
       #align(center)[#diagram]
+      #v(0.7em)
+      #text(size: 0.85em, fill: luma(100))[
+        #grid(
+          columns: (auto, 1fr),
+          column-gutter: 0.4em,
+          align: (right + top, left + top),
+          [*Real-world:*], example,
+        )
+      ]
       #v(1fr)
       #box(width: 100%, terms(anthropic, openai))
     ],
@@ -276,6 +286,7 @@ Four patterns do almost all the work. The next slides show a minimum version of 
 #pattern-slide(
   include "figures/pattern-pipeline.typ",
   [Each stage has its own prompt, tools, and test. Some kind of *deterministic*  gate sits between them.],
+  [Invoice processing: read the PDF, extract line items, validate some policy, then post to accounting.],
   (1, 4, 5, 6, 7),
   [Prompt chaining],
   [Deterministic / sequential workflow],
@@ -291,6 +302,7 @@ Four patterns do almost all the work. The next slides show a minimum version of 
 #pattern-slide(
   include "figures/pattern-fanout.typ",
   [Children do the wide reading; the parent stays small and just synthesizes.],
+  [Company brief before a meeting: one sub-agent per source (news, filings, profiles), merged into one page.],
   (1, 4, 8),
   [Orchestrator-workers / parallelization],
   [Manager pattern ("agents as tools")],
@@ -301,26 +313,12 @@ Four patterns do almost all the work. The next slides show a minimum version of 
   - Parallel, so latency is the slowest child, not the sum
 ]
 
-== Pattern 3: Actor-critic / generate-then-verify
-
-#pattern-slide(
-  include "figures/pattern-actor-critic.typ",
-  [Generator and critic each take the task; a judge weighs both into the output.],
-  (2, 7),
-  [Evaluator-optimizer],
-  [Guardrails + LLM-as-judge],
-)
-
-#speaker-note[
-  - The critic is a fresh context with one job: find what's wrong
-  - The judge sees both the draft and the critique, then decides - no spin loop
-]
-
-== Pattern 4: Routing / triage
+== Pattern 3: Routing / triage
 
 #pattern-slide(
   include "figures/pattern-routing.typ",
   [Classify first, then send down one path with the right model and tools.],
+  [Customer support: "reset my password" goes to the FAQ bot; "dispute this charge" to a billing specialist.],
   (8, 4, 6),
   [Routing],
   [Triage agent + handoffs],
@@ -331,16 +329,79 @@ Four patterns do almost all the work. The next slides show a minimum version of 
   - Easy questions go to a small model; only the hard path pays for the big one
 ]
 
-== Cross-source convergence
+== Pattern 4: Actor-critic / generate-then-verify
 
-The patterns everyone teaches (same idea, different names):
+#pattern-slide(
+  include "figures/pattern-actor-critic.typ",
+  [Generator and critic each take the task; a judge (or the critic) weighs both into the output.],
+  [Scientific analysis: one model interprets the results, another challenges the stats and confounds, a judge keeps what holds up.],
+  (2, 7),
+  [Evaluator-optimizer],
+  [Guardrails + LLM-as-judge],
+)
 
-- *Reflection / evaluator-optimizer / actor-critic* - one generates, one critiques.
-- *Routing* - classify, send to a specialized path or model.
-- *Parallelization / fan-out* - sectioning (independent subtasks) + voting (same task N times for confidence).
-- *Orchestrator-workers / manager / supervisor* - decompose, delegate, synthesize.
-- *Handoffs / decentralized control* - agents pass control to each other.
-- *Prompt chaining / sequential workflow* - steps with programmatic gates between them.
+#speaker-note[
+  - The critic is a fresh context with one job: find what's wrong
+  - The judge sees both the draft and the critique, then decides - no spin loop
+]
+
+== Which patterns can you spot?
+
+#align(center)[
+  #include "figures/task-agent.typ"
+]
+
+#v(0.5em)
+#pause
+
+#grid(
+  columns: (1fr, 1fr),
+  column-gutter: 1.5em,
+  row-gutter: 1em,
+  lblock(inset: (x: 0.6em, y: 0.5em))[#align(center)[Pipeline]],
+  lblock(inset: (x: 0.6em, y: 0.5em))[#align(center)[*Fan-out subagents*]],
+
+  lblock(inset: (x: 0.6em, y: 0.5em))[#align(center)[*Actor-critic*]],
+  lblock(inset: (x: 0.6em, y: 0.5em))[#align(center)[*Routing / triage*]],
+)
+
+== Many, many patterns
+
+// Pull content out to a 1em side margin (theme default is 2em).
+#pad(x: -.8em)[
+  #grid(
+    columns: (1fr, 1fr),
+    column-gutter: 1em,
+    align: top,
+    [
+      - *evaluator-optimizer / actor-critic* - one generates, one critiques.
+      - *Routing* - classify, send to a specialized path or model.
+      - *Parallelization / fan-out* - sectioning (independent subtasks) + voting (same task N times for confidence).
+      - *Orchestrator-workers / manager / supervisor* - decompose, delegate, synthesize.
+      - *Handoffs / decentralized control* - agents pass control to each other.
+      - *Prompt chaining / sequential workflow* - steps with programmatic gates between them.
+    ],
+    [
+      - *ReAct (reason + act)* - interleave a thought with each tool call.
+      - *Plan-and-execute* - draft the whole plan first, then run the steps.
+      - *Reflexion / self-correction* - retry using feedback from past attempts.
+      - *RAG / retrieval-augmented* - pull relevant knowledge into context on demand.
+      - *Tree-of-thoughts / search* - branch into candidates, score, then prune.
+      - *Human-in-the-loop / escalation* - pause for a person at risky or low-confidence steps.
+
+      #lblock(inset: 0.2em)[
+        The list is near-infinite. \
+        *Experiment* and find what works for you.
+      ]
+    ],
+  )
+]
+
+
+#speaker-note[
+  - These layer on top of the structural patterns; most agents combine several
+  - ReAct + RAG is the workhorse; escalation is the safety net
+]
 
 #focus-slide[
   Start with the simplest thing. \
@@ -380,7 +441,13 @@ The patterns everyone teaches (same idea, different names):
 
 == Handoffs
 
-This is a test
+This is a
+
+
+#align(center)[
+  #include "figures/task-agent.typ"
+]
+
 
 = Tool design
 
@@ -582,39 +649,6 @@ Each new agent component is a fresh source of risk:
   - Reversibility is the cheapest lever: a reversible action needs far less oversight
 ]
 
-== Read the framework
-
-#grid(
-  columns: (1fr, auto),
-  align: horizon,
-  gutter: 1.5em,
-  [
-    *Model AI Governance Framework for Agentic AI* \
-    #text(size: 0.9em)[IMDA Singapore, v1.5, May 2026 (updated June 2026)]
-
-    #v(0.5em)
-    #text(size: 0.8em, font: "DejaVu Sans Mono")[imda.gov.sg/.../mgf-for-agentic-ai.pdf]
-  ],
-  box(fill: white, inset: 0.6em)[
-    #qrcode(
-      "https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf",
-      width: 5cm,
-    )
-  ],
-)
-
-#speaker-note[
-  - Living document; IMDA invites feedback and case studies
-  - Good handout: concrete, organisation-facing, vendor-neutral
-]
-
-= Sources & further reading
-
-== Read these next
-
-- *Anthropic* - "Building Effective Agents" - workflows vs. agents; 5 workflow patterns. \ #text(size: 0.8em, font: "DejaVu Sans Mono")[anthropic.com/engineering/building-effective-agents]
-- *OpenAI* - "A Practical Guide to Building Agents" (~30pp PDF) - single vs. multi-agent; manager vs. handoff. \ #text(size: 0.8em, font: "DejaVu Sans Mono")[cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf]
-- *Victor Dibia* - "Designing Multi-Agent Systems" (2025, 15 ch.) - systems as computational graphs; production depth. \ #text(size: 0.8em, font: "DejaVu Sans Mono")[newsletter.victordibia.com/p/the-designing-multi-agent-systems]
 
 = Let's Get Started
 
@@ -638,4 +672,18 @@ Each new agent component is a fresh source of risk:
       ]
     ],
   )
+]
+
+= Sources & further reading
+
+== Resources
+
+- *Anthropic* - "Building Effective Agents" - workflows vs. agents; 5 workflow patterns.
+- *OpenAI* - "A Practical Guide to Building Agents" (~30pp PDF) - single vs. multi-agent; manager vs. handoff.
+- *Victor Dibia* - "Designing Multi-Agent Systems" (2025, 15 ch.) - systems as computational graphs; production depth.
+- *IMDA Singapore* - "Model AI Governance Framework for Agentic AI" (v1.5, May 2026) - organisation-facing agent governance.
+
+#speaker-note[
+  - IMDA framework is a living document; they invite feedback and case studies
+  - Good handout: concrete, organisation-facing, vendor-neutral
 ]

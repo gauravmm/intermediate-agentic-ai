@@ -10,7 +10,7 @@
   edge((0, 1), (1, 1), "-|>"),
   node((2, 0), [Cheap model]),
   node((2, 1), [Specialist A]),
-  node((2, 2), [Specailist B]),
+  node((2, 2), [Specialist B]),
   edge((1, 1), (2, 0), "-|>"),
   edge((1, 1), (2, 1), "-|>", label: text(size: 0.7em)[pick one]),
   edge((1, 1), (2, 2), "-|>"),
