@@ -3,6 +3,7 @@
 
 #import "@preview/tiaoma:0.3.0": qrcode
 #import "@preview/numbly:0.1.0": numbly
+#import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node
 
 #show: metropolis-theme.with(
   aspect-ratio: "16-9",
@@ -68,81 +69,68 @@
 // DRAFT. Content dumped from spec/CONTENT.md, organised by topic. Not arranged
 // for flow or density yet. Graphic proposals are marked with #gfx[...].
 // ============================================================================
+= How to think about agents
 
 == Where we're starting from
 
 You've built a toy agent. You know the basic loop:
 
-#align(center)[#text(size: 1.4em, font: "DejaVu Sans Mono")[act -> observe -> act]]
+#align(center)[
+  #diagram(
+    spacing: 3.5em,
+    node-stroke: 0.8pt,
+    node-fill: luma(240),
+    node-corner-radius: 4pt,
+    node((0, 0), [Task], fill: luma(225)),
+    node((1, 0), [Agent]),
+    node((2, 0), [Output], fill: luma(225)),
+    edge((0, 0), (1, 0), "-|>"),
+    edge((1, 0), (2, 0), "-|>"),
+    edge((1, 0), (1, 0), "-|>", bend: 130deg),
+  )
+]
 
-#v(1em)
+This is what we're building today.
 
-Today: how to build agents that are *real*. Reliable, testable, in production.
-
-#gfx[The act/observe loop as a simple cycle diagram; "you are here" marker on the toy loop, arrow pointing to a bigger production system.]
+#align(center)[
+  #include "figures/task-agent.typ"
+]
 
 #speaker-note[
   - Anchor on what the beginner session already covered: the act/observe loop
   - The gap we're closing today: toy that works once -> system you can trust
 ]
 
-= How to think about agents
 
-== An agent is a loop, not a magic box
+== What an agent really is
 
 #grid(
   columns: (1fr, 1fr),
   gutter: 2em,
-  align: top,
-  grid(
-    columns: 1,
-    rows: 1fr,
-    gutter: 0.4em,
-    label-item[It's a loop over an LLM with tools][Not a magic box. You can reason about every step.],
-    label-item[The model is the unreliable part][Everything around it is your job to make reliable.],
-    label-item[Agents are like employees][You give context, tools, and a goal. Not step-by-step instructions.],
-  ),
+  align: horizon,
   [
-    #v(1fr)
+    #text(size: 1.3em)[
+      An agent is a powerful but imprecise *LLM*, wrapped in the engineering
+      that makes it *reliable*, *performant*, *understandable*, and *safe*.
+    ]
+  ],
+  [
     #align(center)[
       #scale(100%, reflow: true)[
         #include "figures/agentic-loop.typ"
       ]
     ]
-    #v(1fr)
   ],
 )
 
 #speaker-note[
-  - Punchline: you own the reliability, the model just makes fuzzy decisions
-  - "Employee not robot" framing is the mental shift from beginner to intermediate
+  - You own reliability; the model just makes fuzzy decisions
+  - Jet engine vs aircraft: LLM is the engine, the engineering is airframe + pilot
+  - The four properties are what the airframe buys; the engine alone gives none
 ]
 
-== When NOT to use an agent
 
-#grid(
-  columns: (1fr, 1fr),
-  gutter: 1em,
-  gblock[
-    *Deterministic task?* \
-    Write code.
-  ],
-  gblock[
-    *One-shot task?* \
-    Just prompt.
-  ],
-)
 
-#v(1em)
-
-Reach for an agent only when the task needs *judgment over many steps* with tools.
-
-#gfx[Decision flowchart: "deterministic? -> code", "one-shot? -> prompt", "needs judgment + tools + many steps? -> agent".]
-
-#speaker-note[
-  - Everyone agrees across the sources: start with the simplest thing that works
-  - Most "agent" problems are actually a prompt or a script in disguise
-]
 
 = Common patterns
 
@@ -157,6 +145,11 @@ Reach for an agent only when the task needs *judgment over many steps* with tool
 
 #gfx[A row of small pattern diagrams (pipeline, fan-out, orchestrator+workers, actor-critic, router). One icon each; this becomes the visual index for the section.]
 
+
+#speaker-note[
+  - Everyone agrees across the sources: start with the simplest thing that works
+  - Most "agent" problems are actually a prompt or a script in disguise
+]
 #speaker-note[
   - This is the menu; each pattern can get its own slide if time allows
   - Tie each back to "why split": context, focus, testability

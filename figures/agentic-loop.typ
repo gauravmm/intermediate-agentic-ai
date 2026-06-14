@@ -55,7 +55,7 @@
     arr(yp, yg)
     node(yg, [Gather context], fill: g-fill)
     arr(yg, ya)
-    node(ya, [Take action], fill: g-fill)
+    node(ya, [LLM], fill: g-fill)
     arr(ya, yv)
     node(yv, [Verify results], fill: g-fill)
     arr(yv, yd)
