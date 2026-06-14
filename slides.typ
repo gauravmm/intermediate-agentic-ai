@@ -79,6 +79,86 @@
   )[#text(fill: luma(90))[🖼 #text(weight: "bold")[Graphic:] #desc]]
 ]
 
+// Accent colour shared by the pattern diagrams (gates) and the helps column.
+#let accent = rgb("#c7793e")
+
+// The eight principles, in order; index in this list == principle number.
+#let principle-names = (
+  [Context rot],
+  [Credulity],
+  [Abstraction],
+  [Specialization],
+  [Observability],
+  [Least privilege],
+  [Testability],
+  [Cost or latency],
+)
+
+// Number badge: orange when the principle applies, muted grey otherwise.
+#let pnum(n, on) = box(
+  fill: if on { accent } else { luma(210) },
+  inset: (x: 0.42em, y: 0.12em),
+  radius: 0.3em,
+  baseline: 0.2em,
+  text(fill: white, weight: "bold", size: 0.8em)[#n],
+)
+
+// Right-hand sidebar: always lists all 8 principles; lights up the ones a
+// pattern serves. `applies` is an array of principle numbers, e.g. (1, 4, 7).
+#let helps(applies) = [
+  #v(1fr)
+  #text(size: 0.8em, fill: luma(120), weight: "bold", tracking: 0.08em)[HELPS WITH]
+  #v(0.1em)
+  #for (i, name) in principle-names.enumerate() {
+    let n = i + 1
+    let on = applies.contains(n)
+    [
+      #pnum(n, on) #h(0.35em) #text(
+        size: 1em,
+        fill: if on { accent } else { luma(165) },
+        weight: if on { "bold" } else { "regular" },
+      )[#name]\
+      #v(0em)
+    ]
+  }
+  #v(1fr)
+]
+
+// Footer: the canonical name each source uses for this pattern.
+// 3-column grid so the dot separators line up vertically.
+#let terms(anthropic, openai) = lblock(inset: (x: 0.7em, y: 0.45em), outset: 0pt)[
+  #text(size: 0.85em, fill: luma(60))[
+    #grid(
+      columns: (auto, auto, 1fr),
+      column-gutter: 0.5em,
+      row-gutter: 0.35em,
+      align: (right + horizon, center + horizon, left + horizon),
+      text(weight: "bold")[Anthropic], sym.dot.c, anthropic,
+      text(weight: "bold")[OpenAI], sym.dot.c, openai,
+    )
+  ]
+]
+
+// A full pattern slide body: diagram + caption on the left, helps column on the
+// right, source terms along the bottom. Drop in under a `==` slide heading.
+#let pattern-slide(diagram, caption, applies, anthropic, openai) = {
+  grid(
+    columns: (1fr, auto),
+    column-gutter: 1.5em,
+    align: horizon,
+    [
+      #v(1em)
+      #caption
+      #v(1fr)
+      #align(center)[#diagram]
+      #v(1fr)
+      #box(width: 100%, terms(anthropic, openai))
+    ],
+    helps(applies),
+  )
+  v(0.5em)
+}
+
 #title-slide()
 
 // ============================================================================
@@ -92,18 +172,7 @@
 You've built a toy agent. You know the basic loop:
 
 #align(center)[
-  #diagram(
-    spacing: 3.5em,
-    node-stroke: 0.8pt,
-    node-fill: luma(240),
-    node-corner-radius: 4pt,
-    node((0, 0), [Task], fill: luma(225)),
-    node((1, 0), [Agent]),
-    node((2, 0), [Output], fill: luma(225)),
-    edge((0, 0), (1, 0), "-|>"),
-    edge((1, 0), (2, 0), "-|>"),
-    edge((1, 0), (1, 0), "-|>", bend: 130deg),
-  )
+  #include "figures/basic-loop.typ"
 ]
 
 This is what we're building today.
@@ -144,7 +213,7 @@ This is what we're building today.
 ]
 
 
-== Why can't we just use an agent?
+== Why can't we just use ONE agent?
 
 One big agent fails in ways you can't see, fix, or contain.
 
@@ -167,9 +236,17 @@ One big agent fails in ways you can't see, fix, or contain.
 )
 
 #speaker-note[
-  - This slide is the "why" for the whole patterns section that follows
-  - Each failure mode maps to a fix: context rot->small focused windows; credulity->validate tool/page output; abstraction->stable stage contracts; observability->traced sub-steps; least privilege->scoped tools; testability->stage boundaries; cost->routing
-  - The seam is the unit of engineering - you can't instrument a monolith
+  Motivating example: a "research assistant" you ask to research a topic and email a summary.
+  As ONE agent it must search the web, read ~20 pages, draft, and send the mail - all in one context.
+  Walk the same eight numbers down the failure modes:
+  - Context rot: 20 raw pages crowd out the original task.
+  - Credulity: one poisoned page and it follows the instructions hidden in it.
+  - Abstraction / Specialization: search, write, and send are jammed into one fuzzy prompt.
+  - Observability: it emails the wrong person - which step went wrong? You can't tell.
+  - Least privilege: it holds web + file + send-email tools the entire time.
+  - Testability: you can't test "find sources" apart from "write the summary".
+  - Cost & latency: a frontier model burns tokens on trivial fetches.
+  Each failure maps to one principle - and each is fixed by splitting the work, which is the next section.
 ]
 
 
@@ -177,14 +254,12 @@ One big agent fails in ways you can't see, fix, or contain.
 
 == Split work; don't build one mega-agent
 
+Four patterns do almost all the work. The next slides show a minimum version of each.
+
 - *Pipeline vs. single mega-agent* - splitting helps context, focus, and testability.
 - *Fan-out subagents* - spawn N agents to search the web / a codebase in parallel, then synthesize. Parent stays small; children do the wide reading.
-- *Orchestrator + workers* - map-reduce over a work list.
 - *Actor-critic / generate-then-verify* - adversarial check before committing.
-- *Loop-until-done vs. fixed stages.*
-- *Routing / triage* - cheap model classifies, expensive model handles.
-
-#gfx[A row of small pattern diagrams (pipeline, fan-out, orchestrator+workers, actor-critic, router). One icon each; this becomes the visual index for the section.]
+- *Routing / triage* - cheap/expensive split, or for specialized tools and prompts.
 
 
 #speaker-note[
@@ -196,24 +271,64 @@ One big agent fails in ways you can't see, fix, or contain.
   - Tie each back to "why split": context, focus, testability
 ]
 
-== The standard taxonomy (so you can read the literature)
+== Pattern 1: Pipeline, not one mega-agent
 
-Three sources, one shared vocabulary:
-
-#grid(
-  columns: (1fr, 1fr, 1fr),
-  gutter: 0.8em,
-  align: top,
-  lblock[*Anthropic* \ "Building Effective Agents" \ #text(size: 0.85em)[Workflows vs. agents; 5 workflow patterns.]],
-  lblock[*OpenAI* \ "A Practical Guide to Building Agents" \ #text(size: 0.85em)[Single vs. multi-agent; manager vs. handoff.]],
-  lblock[*Victor Dibia* \ "Designing Multi-Agent Systems" \ #text(size: 0.85em)[Systems as computational graphs; production depth.]],
+#pattern-slide(
+  include "figures/pattern-pipeline.typ",
+  [Each stage has its own prompt, tools, and test. Some kind of *deterministic*  gate sits between them.],
+  (1, 4, 5, 6, 7),
+  [Prompt chaining],
+  [Deterministic / sequential workflow],
 )
 
-#gfx[Three book/article covers side by side, with arrows converging onto a shared list of pattern names.]
+#speaker-note[
+  - The default starting shape: a fixed code path with an LLM call at each step
+  - Gates are plain code (validation, retries) - not another agent
+]
+
+== Pattern 2: Fan-out subagents
+
+#pattern-slide(
+  include "figures/pattern-fanout.typ",
+  [Children do the wide reading; the parent stays small and just synthesizes.],
+  (1, 4, 8),
+  [Orchestrator-workers / parallelization],
+  [Manager pattern ("agents as tools")],
+)
 
 #speaker-note[
-  - Goal: attendees can map our material onto what they'll read elsewhere
-  - Adopt Anthropic's taxonomy wholesale; it's the canonical one
+  - Each child's context is thrown away after it returns a short result - that's the win
+  - Parallel, so latency is the slowest child, not the sum
+]
+
+== Pattern 3: Actor-critic / generate-then-verify
+
+#pattern-slide(
+  include "figures/pattern-actor-critic.typ",
+  [Generator and critic each take the task; a judge weighs both into the output.],
+  (2, 7),
+  [Evaluator-optimizer],
+  [Guardrails + LLM-as-judge],
+)
+
+#speaker-note[
+  - The critic is a fresh context with one job: find what's wrong
+  - The judge sees both the draft and the critique, then decides - no spin loop
+]
+
+== Pattern 4: Routing / triage
+
+#pattern-slide(
+  include "figures/pattern-routing.typ",
+  [Classify first, then send down one path with the right model and tools.],
+  (8, 4, 6),
+  [Routing],
+  [Triage agent + handoffs],
+)
+
+#speaker-note[
+  - The router is cheap and does one thing: classify and dispatch
+  - Easy questions go to a small model; only the hard path pays for the big one
 ]
 
 == Cross-source convergence
@@ -231,37 +346,6 @@ The patterns everyone teaches (same idea, different names):
   Start with the simplest thing. \
   One agent + good tools beats a multi-agent maze.
 ]
-
-== Anthropic: building block + key distinction
-
-- *Building block:* the augmented LLM (model + retrieval + tools + memory).
-- *Key distinction:* #text(weight: "bold")[workflows] (LLMs on fixed, predefined code paths) vs. #text(weight: "bold")[agents] (LLM directs its own process and tool use).
-- *Five workflow patterns:* prompt chaining, routing, parallelization (sectioning + voting), orchestrator-workers, evaluator-optimizer.
-
-#gfx[The "augmented LLM" block diagram (model core + retrieval + tools + memory plugged in), then the workflow-vs-agent split.]
-
-#speaker-note[
-  - Orchestrator-workers differs from sectioning: subtasks are NOT predetermined
-  - These map to our topics: parallelization -> fan-out, evaluator-optimizer -> testing
-]
-
-== OpenAI: the three components + orchestration
-
-- *Agent = model + tools + instructions.*
-- *Tool categories:* data (retrieve/query), action (write/do), orchestration (other agents as tools).
-- *Instructions:* objectives + success criteria, constraints, format/tone, escalation thresholds.
-- *Orchestration:* single-agent (start here) -> manager pattern (coordinator delegates, "agents as tools") -> decentralized / handoff (agents pass control).
-
-#gfx[Manager pattern vs. handoff pattern side by side: hub-and-spoke vs. a chain passing a baton.]
-
-== Dibia: systems as computational graphs
-
-- *Frame:* agentic systems as computational graphs.
-- *Deterministic workflows:* sequential, parallel, supervisor.
-- *Autonomous orchestration:* plan-based, handoff, conversation-driven (predictability vs. flexibility trade-off).
-- *Named patterns:* round-robin, Magentic-One.
-
-#gfx[A computational-graph diagram with nodes (agents) and edges (control/data flow); a slider showing predictability <-> flexibility.]
 
 = Rules for individual agents
 
@@ -293,6 +377,10 @@ The patterns everyone teaches (same idea, different names):
   - These are the per-agent discipline rules; map to OpenAI "instructions" + Anthropic principles
   - Escape hatch is underrated: forced guesses are where agents quietly go wrong
 ]
+
+== Handoffs
+
+This is a test
 
 = Tool design
 
@@ -524,11 +612,9 @@ Each new agent component is a fresh source of risk:
 
 == Read these next
 
-- *Anthropic* - "Building Effective Agents" \ #text(size: 0.8em, font: "DejaVu Sans Mono")[anthropic.com/engineering/building-effective-agents]
-- *OpenAI* - "A Practical Guide to Building Agents" (~30pp PDF) \ #text(size: 0.8em, font: "DejaVu Sans Mono")[cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf]
-- *Victor Dibia* - "Designing Multi-Agent Systems" (2025, 15 ch.) \ #text(size: 0.8em, font: "DejaVu Sans Mono")[newsletter.victordibia.com/p/the-designing-multi-agent-systems]
-
-#gfx[Three QR codes, one per source, so attendees can grab the links from their seats.]
+- *Anthropic* - "Building Effective Agents" - workflows vs. agents; 5 workflow patterns. \ #text(size: 0.8em, font: "DejaVu Sans Mono")[anthropic.com/engineering/building-effective-agents]
+- *OpenAI* - "A Practical Guide to Building Agents" (~30pp PDF) - single vs. multi-agent; manager vs. handoff. \ #text(size: 0.8em, font: "DejaVu Sans Mono")[cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf]
+- *Victor Dibia* - "Designing Multi-Agent Systems" (2025, 15 ch.) - systems as computational graphs; production depth. \ #text(size: 0.8em, font: "DejaVu Sans Mono")[newsletter.victordibia.com/p/the-designing-multi-agent-systems]
 
 = Let's Get Started
 
