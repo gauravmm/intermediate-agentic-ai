@@ -13,7 +13,7 @@
     subtitle: [Building Real Agents],
     author: [Dr. Gaurav Manek, Ocellivision, IMCB],
     date: datetime.today(),
-    institution: [TechWorks\@ROCK],
+    institution: [Ocellivision + TechWorks\@ROCK],
     logo: [🤖💥🧠🧑‍💻],
   ),
 )
@@ -51,6 +51,22 @@
 #let similar(items) = lblock(inset: (x: 0.6em, y: 0.4em), outset: 0pt)[
   #text(size: 0.85em, fill: luma(80))[#text(weight: "bold")[Other examples] --- #items]
 ]
+
+// Numbered principle: big grey index number + bold title, one-line body, optional example.
+#let principle(num, title, body, example: none) = grid(
+  columns: (1.5em, 1fr),
+  column-gutter: 0.7em,
+  row-gutter: 0.1em,
+  align: (right + top, left + top),
+  text(weight: "bold", size: 3em, fill: luma(140))[#num.],
+  [
+    *#title* \
+    #body
+    #if example != none [
+      \ #text(size: 0.85em, fill: luma(100))[_e.g._ #example]
+    ]
+  ],
+)
 
 // Visible placeholder for a proposed graphic. Draft only; replace with the real figure.
 #let gfx(desc) = align(center)[
@@ -116,9 +132,7 @@ This is what we're building today.
   ],
   [
     #align(center)[
-      #scale(100%, reflow: true)[
-        #include "figures/agentic-loop.typ"
-      ]
+      #image("media/engine-aircraft.png", height: 75%)
     ]
   ],
 )
@@ -130,6 +144,33 @@ This is what we're building today.
 ]
 
 
+== Why can't we just use an agent?
+
+One big agent fails in ways you can't see, fix, or contain.
+
+#grid(
+  columns: (1fr, 1fr),
+  column-gutter: 1.5em,
+  row-gutter: 1em,
+  align: (top + left),
+  principle([1], [Context rot], [keep each window small and on-task.]),
+  principle([2], [Credulity], [the agent trusts too much.]),
+
+  principle([3], [Abstraction], [offer a stable interface for each stage.]),
+  principle([4], [Specialization], [a focused prompt and few tools beats a kitchen sink.]),
+
+  principle([5], [Observability], [see every step, not just the answer.]),
+  principle([6], [Least privilege], [scope tools per stage to avoid security breaches.]),
+
+  principle([7], [Testability], [understand the performance of each step and build confidence.]),
+  principle([8], [Cost & latency], [route cheap models for the easy steps.]),
+)
+
+#speaker-note[
+  - This slide is the "why" for the whole patterns section that follows
+  - Each failure mode maps to a fix: context rot->small focused windows; credulity->validate tool/page output; abstraction->stable stage contracts; observability->traced sub-steps; least privilege->scoped tools; testability->stage boundaries; cost->routing
+  - The seam is the unit of engineering - you can't instrument a monolith
+]
 
 
 = Common patterns

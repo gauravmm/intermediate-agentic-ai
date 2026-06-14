@@ -1,6 +1,6 @@
-# CLAUDE.md — intermediate-agentic-ai
+# CLAUDE.md - intermediate-agentic-ai
 
-Workshop slide deck for an **intermediate** Agentic AI session — a follow-on to the
+Workshop slide deck for an **intermediate** Agentic AI session - a follow-on to the
 beginner tutorial. Presenter: Dr. Gaurav Manek, A\*STAR.
 
 ---
@@ -24,8 +24,8 @@ Slides are written in **Typst** using the **Touying** presentation framework
 
 Two Claude Code skills are installed to assist:
 
-- `touying-author` — Touying-specific APIs, slide structure, animations
-- `typst-author` — general Typst language reference
+- `touying-author` - Touying-specific APIs, slide structure, animations
+- `typst-author` - general Typst language reference
 
 ### Heading levels
 
@@ -43,7 +43,7 @@ Add `<touying:hidden>` to suppress a section from the outline/progress bar.
 #let label-item(title, body) = ...   // bold label + inline body, fills grid cell height
 #let gblock(body) = ...              // grey rounded block
 #let lblock(body) = ...              // white block with light border
-#let similar(items) = ...            // "Other examples — ..." footnote-style block
+#let similar(items) = ...            // "Other examples - ..." footnote-style block
 ```
 
 ### Common patterns
@@ -68,13 +68,13 @@ Use `#only` to add animations in arbitrary order.
 ### Fonts available on this system
 
 Prefer: `DejaVu Sans Mono` (monospace), `DejaVu Sans` (sans-serif).
-Variable fonts (`Ubuntu`, `Ubuntu Mono`) may render incorrectly — avoid.
+Variable fonts (`Ubuntu`, `Ubuntu Mono`) may render incorrectly - avoid.
 
 ---
 
 ## Workflow
 
-1. Edit `slides.typ` — it is the deliverable.
+1. Edit `slides.typ` - it is the deliverable.
 2. Images go in `media/`; reference them as relative paths: `image("media/foo.jpg")`.
 3. Compile with `typst compile slides.typ` from the repo root.
 4. Tag a release (`vX.Y.Z`) to trigger the GitHub Actions build → PDF attached to the release.
@@ -83,7 +83,8 @@ Variable fonts (`Ubuntu`, `Ubuntu Mono`) may render incorrectly — avoid.
 
 ## Content conventions
 
-- **Presenter notes** are written for the *speaker* — talking points, punchlines, things to watch for.
+- **Dashes**: use only the plain hyphen-minus `-`. Never use any other dash character (no em dash, en dash, minus sign, figure dash, horizontal bar, etc.). This applies to `slides.typ`, figures, and this file.
+- **Presenter notes** are written for the *speaker* - talking points, punchlines, things to watch for.
 - **Memes** are first-class slide content.
 - **Slide density**: prefer one strong idea per slide; use `#pause` for progressive reveal.
 - **Prices and model data**: source from OpenRouter (`openrouter.ai/models`); include attribution and date.

@@ -14,15 +14,14 @@ the basic loop (act → observe → act) from the beginner session.
 - The model is the unreliable part; everything around it is your job to make reliable.
 - Agents as employees: you give context, tools, and a goal — not step-by-step instructions.
 - When *not* to use an agent: deterministic task → write code; one-shot task → just prompt.
-- Cost/latency/reliability triangle — every design choice trades these off.
 
 ## 2. Common patterns
 
+- Pipeline vs. single mega-agent — why splitting helps (context, focus, testability).
 - Fan-out subagents: spawn N agents to search the internet / a codebase for ideas in
   parallel, then synthesize. Parent stays small; children do the wide reading.
 - Orchestrator + workers; map-reduce over a work list.
-- Actor–critic / generate-then-verify (adversarial check before committing).
-- Pipeline vs. single mega-agent — why splitting helps (context, focus, testability).
+- Actor-critic / generate-then-verify (adversarial check before committing).
 - Loop-until-done vs. fixed stages.
 - Routing / triage (cheap model classifies, expensive model handles).
 
@@ -68,9 +67,9 @@ the basic loop (act → observe → act) from the beginner session.
 
 ## Loose ends / maybe
 
-- Cost & token budgeting as a first-class concern.
+TODO: Fold this into testing.
+
 - Prompt/version management across a fleet of agents.
-- Where a hands-on exercise fits (build a fan-out research agent? a tool with validation?).
 
 ---
 
@@ -91,12 +90,12 @@ The canonical taxonomy. Worth adopting wholesale.
   2. Routing — classify input, send to a specialized path / model.
   3. Parallelization — *sectioning* (independent subtasks) and *voting* (same task N
      times for confidence). → our topic 2 "fan-out".
-  4. Orchestrator–workers — central LLM decomposes & delegates dynamically, then
+  4. Orchestrator-workers — central LLM decomposes & delegates dynamically, then
      synthesizes. (Subtasks NOT predetermined — that's the difference from sectioning.)
-  5. Evaluator–optimizer — one LLM generates, another critiques in a loop. → topic 6 +
-     actor–critic.
+  5. Evaluator-optimizer — one LLM generates, another critiques in a loop. → topic 6 +
+     actor-critic.
 - **Principles:** simplicity, transparency (show the plan), well-documented + tested
-  tools ("ACI" = agent–computer interface). Start simple; only add complexity when it
+  tools ("ACI" = agent-computer interface). Start simple; only add complexity when it
   earns its keep. → maps to topics 1, 3, 4.
 - **Tool design tips:** give room to reason before acting, keep formats close to natural
   text, avoid formatting overhead, include examples/edge cases, "poka-yoke" (make
@@ -135,18 +134,19 @@ Builds a framework from scratch (`picoagents`); deepest on multi-agent + product
 
 ### Cross-source convergence (the "standard" patterns to teach)
 
-- Reflection / evaluator–optimizer / actor–critic (same idea, 3 names).
+- Reflection / evaluator-optimizer / actor-critic (same idea, 3 names).
 - Routing.
 - Parallelization / fan-out (sectioning + voting).
-- Orchestrator–workers / manager / supervisor.
+- Orchestrator-workers / manager / supervisor.
 - Handoffs / decentralized control.
 - Prompt chaining / sequential deterministic workflow.
 - Everyone agrees: **start with the simplest thing; one agent + good tools beats a
   multi-agent maze.**
 
 Source links:
-- https://www.anthropic.com/engineering/building-effective-agents
-- https://openai.com/business/guides-and-resources/a-practical-guide-to-building-ai-agents/
-  (PDF: https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf)
-- https://newsletter.victordibia.com/p/the-designing-multi-agent-systems
-  (book: https://www.amazon.com/dp/B0G2BCQQJY)
+
+- <https://www.anthropic.com/engineering/building-effective-agents>
+- <https://openai.com/business/guides-and-resources/a-practical-guide-to-building-ai-agents/>
+  (PDF: <https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf>)
+- <https://newsletter.victordibia.com/p/the-designing-multi-agent-systems>
+  (book: <https://www.amazon.com/dp/B0G2BCQQJY>)
