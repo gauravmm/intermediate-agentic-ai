@@ -147,7 +147,7 @@
 // a `==` slide heading.
 #let pattern-slide(diagram, caption, example, applies, anthropic, openai) = {
   grid(
-    columns: (1fr, auto),
+    columns: (1fr, 6.5cm),
     column-gutter: 1.5em,
     align: horizon,
     [
@@ -324,7 +324,10 @@ One big agent fails in ways you can't see, fix, or contain.
 
 #pattern-slide(
   include "figures/pattern-actor-critic.typ",
-  [Generator and critic each take the task; a judge (or the critic) weighs both into the output.],
+  [Generator and critic each take the task; a judge (or the critic) weighs both into the output.
+
+    _This works even when all the models are identical... why?_
+  ],
   [Scientific analysis: one model interprets the results, another challenges the stats and confounds, a judge keeps what holds up.],
   (2, 7),
   [Evaluator-optimizer],
@@ -457,18 +460,18 @@ How do we design *each agent*, and the *handoff* between agents?
   column-gutter: 1.5em,
   row-gutter: 1em,
   align: (top + left),
-  principle([1], [Pass a contract, not a transcript], [a small, structured result; not your whole conversation.]),
+  principle([1], [Pass just enough information], [a small, structured result; not your whole conversation.]),
   principle([2], [One owner at a time], [control transfers explicitly; never two agents on one task.]),
 
   principle([3], [Make the seam observable], [log every handoff so you can find where it broke.]),
   principle(
     [4],
-    [Version the interface],
-    [change one agent without breaking the next, especially if the task needs code.],
+    [Test/enforce the interface],
+    [use automated tests to enforce correctess and structure.],
   ),
 )
 #v(1fr)
-
+#pause
 #lblock()[
   *For this class:* Write each handoff in a named file in a folder.\
   e.g. `query_1/search_A_draft_2.md` or `query_1/email.md`
@@ -551,148 +554,65 @@ Across a fleet of agents you need to version prompts like code, and test on chan
       nope[allowed to make irreversible or expensive decisions,],
       nope[given access to production or secure systems,],
       nope[allowed to talk to anyone who isn't warned about them.],
+      nope[trusted without human oversight],
     )
   ],
   [
-    
+    #pause
+    #align(horizon)[
+      #text(size: 2.2em, weight: "bold")[
+        ...because agents have *real* risks.
+      ]
+    ]
   ],
 )
 
 == Agents act in the real world
 
-That is the whole risk. A chatbot says the wrong thing; an agent *does* the wrong thing.
-
 #grid(
-  columns: (1fr, 1fr),
-  gutter: 1em,
+  columns: (.7fr, auto, 1fr),
+  column-gutter: 1em,
+  align: horizon,
+  // Left: the risks an agent *inherits* - generative over traditional software.
+  grid(
+    columns: (1fr,),
+    row-gutter: 0.5em,
+    align: horizon,
+    gblock[
+      *Generative AI risks*
+      - Hallucinations
+      - Prompt injection
+      - Data leakage
+      - Biased output
+    ],
+    align(center)[#text(size: 1.8em, weight: "bold", fill: accent)[+]],
+    gblock[
+      *Traditional software risks*
+      - SQL injection
+      - Broken auth / access control
+      - Unsafe deserialization
+      - Secrets in logs
+    ],
+  ),
+  // Middle: the agent's exposure is *greater* than just its inherited risks.
+  text(size: 1.8em, weight: "bold", fill: accent)[<],
+  // Right: the risks that are *new* to acting agents.
   gblock[
-    *Generative AI* \
-    Produces text. Worst case: a bad answer.
-  ],
-  gblock[
-    *Agentic AI* \
-    Takes actions, touches data, calls other systems. Worst case: a bad action you can't undo.
+    *Agentic AI risks*
+    - *Erroneous/Unauthorised/Biased* actions without recourse.
+    - *Information leakage*, possibly with compromised tools / MCP servers
+    - *Speed & volume* - decisions happen faster than oversight can catch.
+    - *Cascading effects* - one early mistake propagates and amplifies.
+    - *Agent sprawl* - provenance and compatibility problems.
+    - *Collaborative failures* - agents with incorrect or opposing goals.
+    - *Aimless token burn* - \$\$\$
   ],
 )
-
-#v(0.5em)
-
-Agents inherit *traditional software* risks (e.g. SQL injection) #h(0.3em) + #h(0.3em) *LLM* risks (hallucination, bias, data leakage, prompt injection).
-
-#gfx[Split image: a speech bubble (LLM) vs. a robot arm pressing a big red button (agent). "Words vs. actions".]
 
 #speaker-note[
   - Framing for the whole section, from IMDA's MGF for Agentic AI (v1.5, May 2026)
   - The new capability (taking actions) is exactly the new risk
 ]
-
-== New components, new attack surfaces
-
-Each new agent component is a fresh source of risk:
-
-- *Planning & reasoning* - hallucination or semantic misalignment: a plan that can't achieve the task, contradicts intent, or drifts from an earlier plan.
-- *Tools* - call non-existent tools, the wrong tool, the right tool with wrong inputs; prompt/code injection can make the agent exfiltrate or corrupt data.
-- *Protocols* - emerging agent-comms protocols can be poorly deployed or compromised, e.g. an untrusted MCP server that exfiltrates user data.
-
-#gfx[The augmented-LLM diagram from earlier, re-used with each component (planner, tools, protocol/MCP) flagged with a small warning icon.]
-
-#speaker-note[
-  - Callback to the "augmented LLM" diagram: same parts, now viewed as attack surface
-  - MCP example lands well: untrusted server = supply-chain risk for agents
-]
-
-== Types of harmful outcome
-
-#grid(
-  columns: (1fr, 1fr),
-  gutter: 0.4em,
-  align: top,
-  grid(
-    columns: 1,
-    rows: 1fr,
-    gutter: 0.4em,
-    label-item[Erroneous actions][Wrong date booked, flawed code shipped.],
-    label-item[Unauthorised actions][Acting outside permitted scope; skipping required approval.],
-    label-item[Biased or unfair actions][Biased hiring, procurement, or grant decisions.],
-  ),
-  grid(
-    columns: 1,
-    rows: 1fr,
-    gutter: 0.4em,
-    label-item[Data breaches][Leaking or wrongly modifying sensitive data.],
-    label-item[Disruption to connected systems][Deleting a prod codebase; flooding an external API.],
-  ),
-)
-
-#speaker-note[
-  - Agents don't just leak data like an LLM; they can also modify it
-  - "Disruption to connected systems" is the one people forget
-]
-
-== Systemic & multi-agent risks
-
-- *Speed & volume* - decisions happen faster than oversight can catch; pushing humans to approve everything causes automation bias and alert fatigue.
-- *Cascading effects* - one early mistake (e.g. a hallucinated inventory figure) propagates and amplifies downstream.
-- *Agent sprawl* - uncontrolled proliferation; provenance and compatibility problems.
-- *Collaborative failures* - miscoordination (agents pursue different readings of intent) and conflict (agents optimising opposing goals, e.g. refunds vs. revenue protection).
-
-#gfx[A small multi-agent graph where one red error node cascades through edges to several downstream nodes.]
-
-#speaker-note[
-  - Multi-agent makes everything worse: shared context/memory widens the leak surface
-  - The refunds-vs-revenue example is a memorable "agents in conflict" case
-]
-
-== IMDA's framework: four areas
-
-#grid(
-  columns: (1fr, 1fr),
-  gutter: 0.4em,
-  align: top,
-  grid(
-    columns: 1,
-    rows: 1fr,
-    gutter: 0.4em,
-    label-item[
-      1. Assess & bound risks upfront
-    ][Judge by scope of actions, reversibility, and autonomy. Limit tool/system access by design.],
-    label-item[
-      2. Make humans meaningfully accountable
-    ][Assign responsibility across vendors and teams; human checkpoints for high-stakes / irreversible actions.],
-  ),
-  grid(
-    columns: 1,
-    rows: 1fr,
-    gutter: 0.4em,
-    label-item[
-      3. Technical controls & processes
-    ][Controls for planning/tools/protocols; test execution accuracy, policy adherence, tool use; monitor after deploy.],
-    label-item[
-      4. Enable end-user responsibility
-    ][Tell users the agent's actions, data access, and their own duties; train for effective oversight.],
-  ),
-)
-
-#speaker-note[
-  - This is the spine of the IMDA Model AI Governance Framework for Agentic AI
-  - Note it targets organisations deploying agents, in-house or third-party
-]
-
-== Practical levers you can pull today
-
-- *Bound by design* - least privilege on tools; prefer reversible actions; match autonomy to stakes.
-- *Identity & access management for agents* - so actions are traceable and controllable.
-- *Human checkpoints* - require approval for irreversible / high-stakes steps; audit that the oversight stays effective (guard against automation bias).
-- *Test new dimensions* - execution accuracy, policy adherence, tool-use correctness.
-- *Roll out gradually* - continuous monitoring; not all risks can be anticipated upfront.
-
-#gfx[A "dial" visual: autonomy/scope on one axis, required human oversight on the other; high-stakes actions sit in the "needs a checkpoint" zone.]
-
-#speaker-note[
-  - These map onto the four areas; pick the ones relevant to the audience's stage
-  - Reversibility is the cheapest lever: a reversible action needs far less oversight
-]
-
 
 = How to implement
 
