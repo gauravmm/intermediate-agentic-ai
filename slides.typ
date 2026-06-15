@@ -664,8 +664,38 @@ Four guiding questions:
 = How to implement
 
 #focus-slide[
-  Start with the simplest thing. \
-  One agent + good tools beats a multi-agent maze.
+  #text(size: 0.8em)[
+    "A complex system that works is invariably found to have evolved from a
+    simple system that worked."
+  ]
+  #v(0.5em)
+  #text(size: 0.6em, fill: luma(180))[- John Gall, _Systemantics_ (1975)]
+]
+
+#speaker-note[
+  - Gall's Law: complex systems that work grow out of simple ones that worked
+  - You can't design the multi-agent maze up front; start with one agent + good tools
+  - Anthropic, Building Effective Agents: "the most successful implementations use simple, composable patterns rather than complex frameworks"
+]
+
+== A rough order of concerns
+
+#v(1fr)
+#align(center)[
+  #include "figures/build-order.typ"
+]
+#v(1fr)
+#align(center)[
+  #text(size: 0.9em, fill: luma(90))[
+    The order is *rough* - a failed test sends you back up the chain.
+  ]
+]
+#v(0.5em)
+
+#speaker-note[
+  - Decide once, then live in the build loop; don't over-plan the architecture up front
+  - "What to get right" is where the 8 principles come back in
+  - Gall's Law in practice: the working complex system grew from a working simple one
 ]
 
 = Let's Get Started
