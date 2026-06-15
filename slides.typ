@@ -485,18 +485,29 @@ How do we design *each agent*, and the *handoff* between agents?
   - Versioned interface sets up the prompt + version-management slide later
 ]
 
-= Tool design
-
 == Tools are the agent's API; design them like one
 
-- *The schema is the prompt.* Naming + descriptions matter as much as the code.
-- *Token efficiency.* Terse, structured returns; paginate / truncate big outputs; don't dump raw blobs into context.
-- *Determinism.* Same input -> same output where possible; push variability out of the tool.
-- *Good errors.* Actionable messages the model can recover from (backpressure).
-- *Validation at the boundary.* Reject bad args; don't let the model corrupt state.
-- *Idempotency / safety* for anything with side effects.
+#grid(
+  columns: (1fr, 1fr),
+  column-gutter: 1.5em,
+  row-gutter: 1em,
+  align: (top + left),
+  principle([1], [The schema is the prompt], [naming + descriptions matter as much as the code.]),
+  principle(
+    [2],
+    [Token efficiency],
+    [terse, structured returns; paginate / truncate big outputs; don't dump raw blobs into context.],
+  ),
 
-#gfx[Before/after of a tool return: a giant raw JSON blob vs. a terse structured summary. "What the model sees" framing.]
+  principle([3], [Determinism], [same input -> same output where possible; push variability out of the tool.]),
+  principle([4], [Good errors], [actionable messages the model can recover from (backpressure).]),
+
+  principle([5], [Validation at the boundary], [reject bad args; don't let the model corrupt state.]),
+  principle([6], [Idempotency], [safe to retry anything with side effects.]),
+
+  principle([7], [Principle of least surprise], [behave the way the model expects from the name and schema.]),
+)
+
 
 #speaker-note[
   - Anthropic's ACI (agent-computer interface) idea: tools are UX for the model
@@ -550,11 +561,12 @@ Across a fleet of agents you need to version prompts like code, and test on chan
   [
     #stack(
       spacing: 1.5em,
-      nope[for private data,],
+      nope[for private or confidential data,],
       nope[allowed to make irreversible or expensive decisions,],
       nope[given access to production or secure systems,],
       nope[allowed to talk to anyone who isn't warned about them.],
-      nope[trusted without human oversight],
+      nope[trusted without continuous human oversight.],
+      nope[allowed to interact with other AI agents.],
     )
   ],
   [
@@ -566,6 +578,26 @@ Across a fleet of agents you need to version prompts like code, and test on chan
     ]
   ],
 )
+// On reveal, the framework cover slams down on top of the list of "nots".
+#pause
+
+#place(left + horizon, dx: 0.5cm)[
+  #box[
+    // Soft drop shadow: a grey rectangle offset behind the cover.
+    #place(top + left, dx: 6pt, dy: 6pt)[
+      #box(fill: luma(160, 70%), radius: 0.3em, width: 10.5cm, height: 13.5cm)
+    ]
+    #block(
+      stroke: 0.75pt + luma(170),
+      radius: 0.3em,
+      clip: true,
+      fill: white,
+      inset: 0pt,
+    )[
+      #image("media/mgf-for-agentic-ai-thumb.png", height: 100%)
+    ]
+  ]
+]
 
 == Agents act in the real world
 
