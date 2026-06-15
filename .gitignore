@@ -1,3 +1,5 @@
 *.pdf
 **/figures/*.png
 .DS_Store
+_preview/
+_t*.typ

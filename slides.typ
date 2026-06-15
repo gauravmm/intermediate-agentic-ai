@@ -243,14 +243,14 @@
   principle([1], [Context rot], [keep each window small and on-task.]),
   principle([2], [Credulity], [the agent trusts too much.]),
 
-  principle([3], [Abstraction], [offer a stable interface for each stage.]),
+  principle([3], [Abstraction], [allow higher-level processes to ignore irrelevant details about low-level tasks.]),
   principle([4], [Specialization], [a focused prompt and few tools beats a kitchen sink.]),
 
   principle([5], [Observability], [see every step, not just the answer.]),
   principle([6], [Least privilege], [scope tools per stage to avoid security breaches.]),
 
   principle([7], [Testability], [understand the performance of each step and build confidence.]),
-  principle([8], [Cost & latency], [route cheap models for the easy steps.]),
+  principle([8], [Cost & latency], [route cheap models for the easy steps, or get the job done quicker.]),
 )
 
 One big agent fails in ways you can't see, fix, or contain.
@@ -399,15 +399,26 @@ One big agent fails in ways you can't see, fix, or contain.
 
 == Many agents make a pipeline
 
+#v(1fr)
+
 How do we design *each agent*, and the *handoff* between agents?
 
 #align(center)[
   #include "figures/task-agent.typ"
 ]
 
-What agents do we have
+#v(1fr)
+- *Agent Design* What agents do we have? What do each of them specialize in?
+- *Handoff Design* What information must they pass to one another?
+#v(1fr)
 
 == One agent, one job
+
+#align(center)[
+  #include "figures/task-agent-linear.typ"
+]
+#v(1fr)
+
 
 #grid(
   columns: (1fr, 1fr),
@@ -435,8 +446,41 @@ What agents do we have
 
 == Handoffs
 
-This is a
+#align(center)[
+  #include "figures/task-agent-linear.typ"
+]
+#v(1fr)
 
+
+#grid(
+  columns: (1fr, 1fr),
+  column-gutter: 1.5em,
+  row-gutter: 1em,
+  align: (top + left),
+  principle([1], [Pass a contract, not a transcript], [a small, structured result; not your whole conversation.]),
+  principle([2], [One owner at a time], [control transfers explicitly; never two agents on one task.]),
+
+  principle([3], [Make the seam observable], [log every handoff so you can find where it broke.]),
+  principle(
+    [4],
+    [Version the interface],
+    [change one agent without breaking the next, especially if the task needs code.],
+  ),
+)
+#v(1fr)
+
+#lblock()[
+  *For this class:* Write each handoff in a named file in a folder.\
+  e.g. `query_1/search_A_draft_2.md` or `query_1/email.md`
+]
+#v(1fr)
+
+#speaker-note[
+  - Treat the handoff as an API between agents - the seam, not the insides
+  - Contract vs transcript: pass the result, not the context that produced it
+  - One owner: ambiguous control is where two agents fight or both go idle
+  - Versioned interface sets up the prompt + version-management slide later
+]
 
 = Tool design
 
@@ -456,26 +500,9 @@ This is a
   - "poka-yoke" / make mistakes hard to make is the throughline
 ]
 
-= Conditions for a good pipeline
-
-== You can't fix what you can't see
-
-- *Observability.* Log every step: prompts, tool calls, outputs.
-- *Replicability.* Deterministic, re-runnable; capture inputs so a run can be replayed.
-- *Checkpointing / resumability.* Don't redo expensive work on failure.
-- *Isolation of side effects.* Clear blast radius per stage.
-- *Backpressure + rate/cost limits* between stages.
-
-#gfx[A pipeline with a logging/trace rail underneath every stage; a checkpoint marker between stages; a "blast radius" boundary around one stage.]
-
-#speaker-note[
-  - Production framing: this is what separates a demo from a system
-  - Maps to OpenAI guardrails + Dibia's production chapters
-]
-
 = Testing
 
-== Evals are the unit tests of agents
+== You can't fix what you can't see
 
 - *Evals* - without them you're flying blind.
 - *Fixtures* - recorded conversations / tool transcripts; replay them.
@@ -502,6 +529,34 @@ Across a fleet of agents you need to version prompts like code, and test on chan
 ]
 
 = Agent safety & governance
+
+== Agents from this workshop...
+
+// Big "not" set beside a couple of lines of text; the whole list sits in the
+// left half of the slide.
+#let nope(body) = grid(
+  columns: (auto, 1fr),
+  column-gutter: 0.5em,
+  align: (right + horizon, left + horizon),
+  text(weight: "bold", size: 2.4em, fill: accent)[not], body,
+)
+
+#grid(
+  columns: (1fr, 1fr),
+  column-gutter: 1.5em,
+  [
+    #stack(
+      spacing: 1.5em,
+      nope[for private data,],
+      nope[allowed to make irreversible or expensive decisions,],
+      nope[given access to production or secure systems,],
+      nope[allowed to talk to anyone who isn't warned about them.],
+    )
+  ],
+  [
+    
+  ],
+)
 
 == Agents act in the real world
 

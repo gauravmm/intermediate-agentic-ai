@@ -34,7 +34,7 @@
     )
     grid(
       columns: (1fr, 16cm, 1fr),
-      column-gutter: 0.5em,
+      column-gutter: .8em,
       align: (right + bottom, left + bottom),
       section-number,
       stack(

@@ -11,7 +11,7 @@
   label-size: 1em,
 
   // ── input ──
-  node((0, 1), align(center)[Task /\ query], fill: luma(225), shape: fletcher.shapes.circle),
+  node((0.2, 1), align(center)[Task /\ query], fill: luma(225), shape: fletcher.shapes.circle),
 
   // ── fan-out to parallel search actors ──
   node((1.4, 0), [Search agent A], fill: rgb("#eef3ec")),
@@ -44,10 +44,10 @@
   node((3.55, 1), text(fill: acc, weight: "bold")[✕], stroke: none, fill: none),
   edge((2.7, 1), (3.55, 1), "..|>", stroke: acc, label: text(fill: acc)[reject]),
 
-  // ── fan-out to endpoints ──
-  node((5.5, 0), [Slides]),
-  node((5.5, 1), [Email]),
-  node((5.5, 2), align(center)[Log]),
+  // ── fan-out to endpoints (uniform width) ──
+  node((5.5, 0), box(width: 3.4em)[#align(center)[Slides]]),
+  node((5.5, 1), box(width: 3.4em)[#align(center)[Email]]),
+  node((5.5, 2), box(width: 3.4em)[#align(center)[Log]]),
   edge((4.3, 1), (5.5, 0), "-|>"),
   edge((4.3, 1), (5.5, 1), "-|>"),
   edge((4.3, 1), (5.5, 2), "-|>"),
