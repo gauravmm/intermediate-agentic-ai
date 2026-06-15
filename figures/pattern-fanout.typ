@@ -5,7 +5,7 @@
   node-stroke: 0.8pt,
   node-corner-radius: 4pt,
   node-fill: luma(240),
-  node((0, 1), [Task], fill: luma(225)),
+  node((0, 1), [Task], fill: luma(225), shape: fletcher.shapes.circle),
   node((1, 0), [Sub-agent], fill: rgb("#eef3ec")),
   node((1, 1), [Sub-agent], fill: rgb("#eef3ec")),
   node((1, 2), [Sub-agent], fill: rgb("#eef3ec")),
@@ -16,6 +16,6 @@
   edge((1, 0), (2, 1), "-|>"),
   edge((1, 1), (2, 1), "-|>", label: text(size: 0.7em)[fan-in]),
   edge((1, 2), (2, 1), "-|>"),
-  node((3, 1), [Output], fill: luma(225)),
+  node((3, 1), [Output], fill: luma(225), shape: fletcher.shapes.circle),
   edge((2, 1), (3, 1), "-|>"),
 )

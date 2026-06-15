@@ -185,7 +185,7 @@ You've built a toy agent. You know the basic loop:
   #include "figures/basic-loop.typ"
 ]
 
-This is what we're building today.
+This is what we're building today:
 
 #align(center)[
   #include "figures/task-agent.typ"
@@ -225,8 +225,6 @@ This is what we're building today.
 
 == Why can't we just use ONE agent?
 
-One big agent fails in ways you can't see, fix, or contain.
-
 #grid(
   columns: (1fr, 1fr),
   column-gutter: 1.5em,
@@ -245,6 +243,8 @@ One big agent fails in ways you can't see, fix, or contain.
   principle([8], [Cost & latency], [route cheap models for the easy steps.]),
 )
 
+One big agent fails in ways you can't see, fix, or contain.
+
 #speaker-note[
   Motivating example: a "research assistant" you ask to research a topic and email a summary.
   As ONE agent it must search the web, read ~20 pages, draft, and send the mail - all in one context.
@@ -261,25 +261,6 @@ One big agent fails in ways you can't see, fix, or contain.
 
 
 = Common patterns
-
-== Split work; don't build one mega-agent
-
-Four patterns do almost all the work. The next slides show a minimum version of each.
-
-- *Pipeline vs. single mega-agent* - splitting helps context, focus, and testability.
-- *Fan-out subagents* - spawn N agents to search the web / a codebase in parallel, then synthesize. Parent stays small; children do the wide reading.
-- *Actor-critic / generate-then-verify* - adversarial check before committing.
-- *Routing / triage* - cheap/expensive split, or for specialized tools and prompts.
-
-
-#speaker-note[
-  - Everyone agrees across the sources: start with the simplest thing that works
-  - Most "agent" problems are actually a prompt or a script in disguise
-]
-#speaker-note[
-  - This is the menu; each pattern can get its own slide if time allows
-  - Tie each back to "why split": context, focus, testability
-]
 
 == Pattern 1: Pipeline, not one mega-agent
 
@@ -359,10 +340,10 @@ Four patterns do almost all the work. The next slides show a minimum version of 
   column-gutter: 1.5em,
   row-gutter: 1em,
   lblock(inset: (x: 0.6em, y: 0.5em))[#align(center)[Pipeline]],
-  lblock(inset: (x: 0.6em, y: 0.5em))[#align(center)[*Fan-out subagents*]],
+  lblock(inset: (x: 0.6em, y: 0.5em))[#align(center)[Fan-out subagents]],
 
-  lblock(inset: (x: 0.6em, y: 0.5em))[#align(center)[*Actor-critic*]],
-  lblock(inset: (x: 0.6em, y: 0.5em))[#align(center)[*Routing / triage*]],
+  lblock(inset: (x: 0.6em, y: 0.5em))[#align(center)[Actor-critic]],
+  lblock(inset: (x: 0.6em, y: 0.5em))[#align(center)[Routing / triage]],
 )
 
 == Many, many patterns
@@ -374,7 +355,7 @@ Four patterns do almost all the work. The next slides show a minimum version of 
     column-gutter: 1em,
     align: top,
     [
-      - *evaluator-optimizer / actor-critic* - one generates, one critiques.
+      - *Evaluator-optimizer / actor-critic* - one generates, one critiques.
       - *Routing* - classify, send to a specialized path or model.
       - *Parallelization / fan-out* - sectioning (independent subtasks) + voting (same task N times for confidence).
       - *Orchestrator-workers / manager / supervisor* - decompose, delegate, synthesize.
@@ -401,11 +382,6 @@ Four patterns do almost all the work. The next slides show a minimum version of 
 #speaker-note[
   - These layer on top of the structural patterns; most agents combine several
   - ReAct + RAG is the workhorse; escalation is the safety net
-]
-
-#focus-slide[
-  Start with the simplest thing. \
-  One agent + good tools beats a multi-agent maze.
 ]
 
 = Rules for individual agents
@@ -649,6 +625,13 @@ Each new agent component is a fresh source of risk:
   - Reversibility is the cheapest lever: a reversible action needs far less oversight
 ]
 
+
+= How to implement
+
+#focus-slide[
+  Start with the simplest thing. \
+  One agent + good tools beats a multi-agent maze.
+]
 
 = Let's Get Started
 

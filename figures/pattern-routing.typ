@@ -5,7 +5,7 @@
   node-stroke: 0.8pt,
   node-corner-radius: 4pt,
   node-fill: luma(240),
-  node((0, 1), [Task], fill: luma(225)),
+  node((0, 1), [Task], fill: luma(225), shape: fletcher.shapes.circle),
   node((1, 1), [Router]),
   edge((0, 1), (1, 1), "-|>"),
   node((2, 0), [Cheap model]),

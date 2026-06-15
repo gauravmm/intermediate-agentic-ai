@@ -4,21 +4,21 @@
 #let ok = rgb("#6b9c71") // green: accepted path
 
 #diagram(
-  spacing: (3em, 2em),
+  spacing: (2.3em, 2em),
   node-stroke: 0.8pt,
   node-corner-radius: 4pt,
   node-fill: luma(240),
   label-size: 1em,
 
   // ── input ──
-  node((0, 1), align(center)[Task /\ query], fill: luma(225)),
+  node((0, 1), align(center)[Task /\ query], fill: luma(225), shape: fletcher.shapes.circle),
 
   // ── fan-out to parallel search actors ──
   node((1.4, 0), [Search agent A], fill: rgb("#eef3ec")),
   node((1.4, 1), [Search agent B], fill: rgb("#eef3ec")),
   node((1.4, 2), [Search agent C], fill: rgb("#eef3ec")),
   edge((0, 1), (1.4, 0), "-|>"),
-  edge((0, 1), (1.4, 1), "-|>", label: [fan-out]),
+  edge((0, 1), (1.4, 1), "-|>"),
   edge((0, 1), (1.4, 2), "-|>"),
 
   // internet search (self-loop on each actor)
@@ -45,10 +45,42 @@
   edge((2.7, 1), (3.55, 1), "..|>", stroke: acc, label: text(fill: acc)[reject]),
 
   // ── fan-out to endpoints ──
-  node((5.6, 0), [Slides]),
-  node((5.6, 1), [Email]),
-  node((5.6, 2), align(center)[Log]),
-  edge((4.3, 1), (5.6, 0), "-|>"),
-  edge((4.3, 1), (5.6, 1), "-|>", label: [fan-out]),
-  edge((4.3, 1), (5.6, 2), "-|>"),
+  node((5.5, 0), [Slides]),
+  node((5.5, 1), [Email]),
+  node((5.5, 2), align(center)[Log]),
+  edge((4.3, 1), (5.5, 0), "-|>"),
+  edge((4.3, 1), (5.5, 1), "-|>"),
+  edge((4.3, 1), (5.5, 2), "-|>"),
+
+  // ── gate after each endpoint ──
+  node(
+    (6.6, 0),
+    text(size: 0.65em, fill: white, weight: "bold")[GATE],
+    fill: acc,
+    stroke: none,
+    shape: fletcher.shapes.diamond,
+  ),
+  node(
+    (6.6, 1),
+    text(size: 0.65em, fill: white, weight: "bold")[GATE],
+    fill: acc,
+    stroke: none,
+    shape: fletcher.shapes.diamond,
+  ),
+  node(
+    (6.6, 2),
+    text(size: 0.65em, fill: white, weight: "bold")[GATE],
+    fill: acc,
+    stroke: none,
+    shape: fletcher.shapes.diamond,
+  ),
+  edge((5.5, 0), (6.6, 0), "-|>"),
+  edge((5.5, 1), (6.6, 1), "-|>"),
+  edge((5.5, 2), (6.6, 2), "-|>"),
+
+  // ── fan-in to a single output ──
+  node((7.7, 1), [Output], fill: luma(225), shape: fletcher.shapes.circle),
+  edge((6.6, 0), (7.7, 1), "-|>"),
+  edge((6.6, 1), (7.7, 1), "-|>"),
+  edge((6.6, 2), (7.7, 1), "-|>"),
 )
