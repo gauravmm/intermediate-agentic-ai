@@ -5,9 +5,12 @@
 #import "@preview/numbly:0.1.0": numbly
 #import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node
 
+#import "theme.typ": big-section-slide
+
 #show: metropolis-theme.with(
   aspect-ratio: "16-9",
   footer: self => self.info.institution,
+  config-common(new-section-slide-fn: big-section-slide),
   config-info(
     title: [Intermediate Agentic AI],
     subtitle: [Building Real Agents],
@@ -178,22 +181,29 @@
 = How to think about agents
 
 == Where we're starting from
+// Zero bottom margin so the diagrams can run to the slide edge; drop the footer
+// so it doesn't crowd the content.
+#slide(config: config-page(margin: (top: 3em, bottom: 0em), footer: none))[
+  #v(-1em)
+  You've built a toy agent. You know the basic loop:
+  #v(-1em)
+  #align(center)[
+    #include "figures/basic-loop.typ"
+  ]
+  This *workflow* is what we're building today:
+  #v(-1em)
+  #align(center)[
+    #include "figures/task-agent.typ"
+  ]
 
-You've built a toy agent. You know the basic loop:
+  #lblock()[
+    Each *agent* has its own input, prompt, tools, and output. How can we arrange them best?
+  ]
 
-#align(center)[
-  #include "figures/basic-loop.typ"
-]
-
-This is what we're building today:
-
-#align(center)[
-  #include "figures/task-agent.typ"
-]
-
-#speaker-note[
-  - Anchor on what the beginner session already covered: the act/observe loop
-  - The gap we're closing today: toy that works once -> system you can trust
+  #speaker-note[
+    - Anchor on what the beginner session already covered: the act/observe loop
+    - The gap we're closing today: toy that works once -> system you can trust
+  ]
 ]
 
 
@@ -260,7 +270,7 @@ One big agent fails in ways you can't see, fix, or contain.
 ]
 
 
-= Common patterns
+= Common workflow patterns
 
 == Pattern 1: Pipeline, not one mega-agent
 
@@ -386,27 +396,35 @@ One big agent fails in ways you can't see, fix, or contain.
 
 = Rules for individual agents
 
+
+== Many agents make a pipeline
+
+How do we design *each agent*, and the *handoff* between agents?
+
+#align(center)[
+  #include "figures/task-agent.typ"
+]
+
+What agents do we have
+
 == One agent, one job
 
 #grid(
   columns: (1fr, 1fr),
-  gutter: 0.4em,
-  align: top,
-  grid(
-    columns: 1,
-    rows: 1fr,
-    gutter: 0.4em,
-    label-item[One agent, one job][Narrow scope = predictable behaviour.],
-    label-item[Keep context small and relevant][Long context degrades, costs more, hides the signal.],
-    label-item[Explicit stop conditions][Don't let it spin.],
-  ),
-  grid(
-    columns: 1,
-    rows: 1fr,
-    gutter: 0.4em,
-    label-item[State the plan, then act][Steerable and auditable.],
-    label-item[Give it an escape hatch]["If you can't, say so" beats forcing a guess.],
-    label-item[Least privilege][Only the tools it needs for this job.],
+  column-gutter: 1.5em,
+  row-gutter: 1em,
+  align: (top + left),
+  principle([1], [One agent, one job], [narrow scope = predictable, testable, and enforceable behaviour.]),
+  principle([2], [Keep context small and relevant], [long context degrades, costs more, hides the signal.]),
+
+  principle([3], [Explicit stop conditions], [don't let it spin forever, burning millions of tokens.]),
+  principle([4], [State the plan, then act], [you can check the plans and execution separately.]),
+
+  principle([5], [Give it an escape hatch], ["if you can't do it, tell me" allows it to degrade gracefully.]),
+  principle(
+    [6],
+    [Least privilege],
+    [can't leak data you don't have, and can't break things that you can't touch.],
   ),
 )
 
@@ -418,11 +436,6 @@ One big agent fails in ways you can't see, fix, or contain.
 == Handoffs
 
 This is a
-
-
-#align(center)[
-  #include "figures/task-agent.typ"
-]
 
 
 = Tool design

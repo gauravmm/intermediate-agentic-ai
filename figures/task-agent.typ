@@ -4,7 +4,7 @@
 #let ok = rgb("#6b9c71") // green: accepted path
 
 #diagram(
-  spacing: (2.3em, 2em),
+  spacing: (2.3em, 1.6em),
   node-stroke: 0.8pt,
   node-corner-radius: 4pt,
   node-fill: luma(240),
@@ -40,7 +40,7 @@
   // ── fan-in: only the passers (A, C) reach synthesis; B rejected ──
   node((4.3, 1), [Synthesize], fill: luma(232)),
   edge((2.7, 0), (4.3, 1), "-|>", stroke: ok),
-  edge((2.7, 2), (4.3, 1), "-|>", stroke: ok, label: [fan-in]),
+  edge((2.7, 2), (4.3, 1), "-|>", stroke: ok),
   node((3.55, 1), text(fill: acc, weight: "bold")[✕], stroke: none, fill: none),
   edge((2.7, 1), (3.55, 1), "..|>", stroke: acc, label: text(fill: acc)[reject]),
 
