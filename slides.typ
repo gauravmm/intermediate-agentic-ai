@@ -345,19 +345,21 @@ One big agent fails in ways you can't see, fix, or contain.
   #include "figures/task-agent.typ"
 ]
 
-#v(0.5em)
+#v(1.5em)
 #pause
 
+Where did we use each? *Why did we use it there?*
+#v(0.5em)
 #grid(
-  columns: (1fr, 1fr),
+  columns: (1fr, 1fr, 1fr, 1fr),
   column-gutter: 1.5em,
   row-gutter: 1em,
   lblock(inset: (x: 0.6em, y: 0.5em))[#align(center)[Pipeline]],
-  lblock(inset: (x: 0.6em, y: 0.5em))[#align(center)[Fan-out subagents]],
-
+  lblock(inset: (x: 0.6em, y: 0.5em))[#align(center)[Fan-out]],
   lblock(inset: (x: 0.6em, y: 0.5em))[#align(center)[Actor-critic]],
   lblock(inset: (x: 0.6em, y: 0.5em))[#align(center)[Routing / triage]],
 )
+
 
 == Many, many patterns
 
@@ -402,17 +404,16 @@ One big agent fails in ways you can't see, fix, or contain.
 
 == Many agents make a pipeline
 
-#v(1fr)
-
-How do we design *each agent*, and the *handoff* between agents?
-
 #align(center)[
   #include "figures/task-agent.typ"
 ]
 
 #v(1fr)
+Four guiding questions:
 - *Agent Design* What agents do we have? What do each of them specialize in?
 - *Handoff Design* What information must they pass to one another?
+- *Tools Design* What tools do agents need to use? How do we structure them?
+- *Testing* How do we know that our agents work? How can we verify that?
 #v(1fr)
 
 == One agent, one job
@@ -420,9 +421,8 @@ How do we design *each agent*, and the *handoff* between agents?
 #align(center)[
   #include "figures/task-agent-linear.typ"
 ]
+
 #v(1fr)
-
-
 #grid(
   columns: (1fr, 1fr),
   column-gutter: 1.5em,
@@ -441,6 +441,7 @@ How do we design *each agent*, and the *handoff* between agents?
     [can't leak data you don't have, and can't break things that you can't touch.],
   ),
 )
+#v(1fr)
 
 #speaker-note[
   - These are the per-agent discipline rules; map to OpenAI "instructions" + Anthropic principles
@@ -452,9 +453,8 @@ How do we design *each agent*, and the *handoff* between agents?
 #align(center)[
   #include "figures/task-agent-linear.typ"
 ]
+
 #v(1fr)
-
-
 #grid(
   columns: (1fr, 1fr),
   column-gutter: 1.5em,
@@ -485,27 +485,38 @@ How do we design *each agent*, and the *handoff* between agents?
   - Versioned interface sets up the prompt + version-management slide later
 ]
 
-== Tools are the agent's API; design them like one
+== Tools
 
 #grid(
-  columns: (1fr, 1fr),
+  columns: (0.95fr, 1.05fr),
   column-gutter: 1.5em,
-  row-gutter: 1em,
-  align: (top + left),
-  principle([1], [The schema is the prompt], [naming + descriptions matter as much as the code.]),
-  principle(
-    [2],
-    [Token efficiency],
-    [terse, structured returns; paginate / truncate big outputs; don't dump raw blobs into context.],
-  ),
-
-  principle([3], [Determinism], [same input -> same output where possible; push variability out of the tool.]),
-  principle([4], [Good errors], [actionable messages the model can recover from (backpressure).]),
-
-  principle([5], [Validation at the boundary], [reject bad args; don't let the model corrupt state.]),
-  principle([6], [Idempotency], [safe to retry anything with side effects.]),
-
-  principle([7], [Principle of least surprise], [behave the way the model expects from the name and schema.]),
+  align: (top, top),
+  // Left: where tools come from - reach for the shelf first, then build.
+  [
+    #gblock(inset: 0.7em)[
+      #text(weight: "bold")[Reach for what already exists...]
+      #v(0.35em)
+      Web search & fetch #sym.dot.c code execution #sym.dot.c file read/write #sym.dot.c shell #sym.dot.c retrieval #sym.dot.c MCP servers #sym.dot.c browser automation.
+    ]
+    #v(0.9em) #pause
+    #lblock(inset: 0.7em)[
+      #text(weight: "bold")[...then build for your domain]
+      #v(0.35em)
+      Interface with Excel #sym.dot.c Query your DB #sym.dot.c call your API #sym.dot.c send email/Slack #sym.dot.c look up patents #sym.dot.c run a workflow #sym.dot.c chart a variable #sym.dot.c run an analysis.
+    ]
+  ],
+  // Right: the design principles for custom tools.
+  [
+    #pause
+    #stack(
+      spacing: 1.3em,
+      principle([1], [The schema is the prompt], [naming + descriptions matter.]),
+      principle([2], [Token efficiency], [terse, structured returns; don't dump.]),
+      principle([3], [Determinism], [predictable output where possible.]),
+      principle([4], [Good errors], [actionable messages the model can recover from (backpressure).]),
+      principle([5], [Idempotency], [safe to retry anything with side effects.]),
+    )
+  ],
 )
 
 
@@ -514,33 +525,37 @@ How do we design *each agent*, and the *handoff* between agents?
   - "poka-yoke" / make mistakes hard to make is the throughline
 ]
 
-= Testing
 
 == You can't fix what you can't see
 
-- *Evals* - without them you're flying blind.
-- *Fixtures* - recorded conversations / tool transcripts; replay them.
-- *Test tools in isolation* - they're just functions; test them deterministically.
-- *LLM-as-judge* for fuzzy outputs; know its failure modes.
-- *Regression suite* over real past failures.
-- *Adversarial / red-team* - try to break safety and liveness guarantees.
+#grid(
+  columns: (0.65fr, 1fr),
+  column-gutter: 1.5em,
+  align: (top, top),
+  [
+    #text(size: 1.4em)[
 
-#gfx[A test pyramid adapted for agents: deterministic tool tests at the base, fixture replays in the middle, LLM-as-judge + red-team at the top.]
+      An *eval* is a *repeatable measurement* of whether your agent did the right thing on a *known set of inputs*.
+    ]
+    #pause
+    #v(0.6em)
+    An eval is what gives you the confidence to *change* your agent. Without it, how do you know your next prompt tweak hasn't broken something?
+  ],
+  [
+    #pause
+    #text(size: 0.8em, fill: luma(120), weight: "bold", tracking: 0.08em)[WHAT TO MEASURE]
 
-#speaker-note[
-  - Loose end to fold in: prompt/version management across a fleet of agents
-  - LLM-as-judge is convenient but has its own failure modes; flag this
-]
+    - *Quality* - is the agent correct, useful, well-written?
+    - *Shouldn't-say* - No policy violations, no Rick-rolling, no promises the product can't keep.
+    - *Tool calls* - right tool, right arguments, no redundant calls.
+    - *Cost & latency* - a correct answer after 40 tool calls, 4000 tokens of thinking, and 4 minutes is still a failure.
 
-== Loose end: prompt + version management
-
-Across a fleet of agents you need to version prompts like code, and test on change.
-
-#gfx[A simple diagram: prompt registry -> many agents, with version tags and a "diff/rollback" affordance.]
-
-#speaker-note[
-  - TODO in the plan: this belongs under testing / production hygiene
-]
+    #text(size: 0.8em, fill: luma(120), weight: "bold", tracking: 0.08em)[HOW TO MEASURE]
+    - *Eyeball it* - Just... look at it. That's it. #pause
+    - *AI-ception* - Write an AI skill for that.
+    - This #link("https://www.gauravmanek.com/lectures/2026/evals/")[#underline[rabbit hole goes deep]].
+  ],
+)
 
 = Agent safety & governance
 
@@ -566,7 +581,7 @@ Across a fleet of agents you need to version prompts like code, and test on chan
       nope[given access to production or secure systems,],
       nope[allowed to talk to anyone who isn't warned about them.],
       nope[trusted without continuous human oversight.],
-      nope[allowed to interact with other AI agents.],
+      nope[allowed to interact with *other AI* until tested and qualified together.],
     )
   ],
   [
@@ -681,9 +696,14 @@ Across a fleet of agents you need to version prompts like code, and test on chan
 
 == Resources
 
+Agent-building:
+
 - *Anthropic* - "Building Effective Agents" - workflows vs. agents; 5 workflow patterns.
 - *OpenAI* - "A Practical Guide to Building Agents" (~30pp PDF) - single vs. multi-agent; manager vs. handoff.
 - *Victor Dibia* - "Designing Multi-Agent Systems" (2025, 15 ch.) - systems as computational graphs; production depth.
+
+Safety:
+
 - *IMDA Singapore* - "Model AI Governance Framework for Agentic AI" (v1.5, May 2026) - organisation-facing agent governance.
 
 #speaker-note[
