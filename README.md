@@ -20,3 +20,8 @@ builds the PDF in CI and attaches it to a GitHub release.
 `slides.typ` is the single deliverable. It defines a small set of layout macros
 (`label-item`, `gblock`, `lblock`, `similar`) and demonstrates the established slide
 patterns. See `CLAUDE.md` for the full conventions.
+
+## Workshop resources
+
+The participant starter-prompts and the live-demo prompts live in a companion repository:
+[**intermediate-agentic-ai-resources**](https://github.com/gauravmm/intermediate-agentic-ai-resources).
