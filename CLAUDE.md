@@ -11,20 +11,25 @@ beginner tutorial. Presenter: Dr. Gaurav Manek, A\*STAR.
 slides.typ        Typst source for the compiled slide deck (the deliverable)
 figures/          Generated figures (typ sources + rendered .png); .png is gitignored
 media/            Images, memes, diagrams used on slides
-demo/             Live-demo prompts run during the talk (see below)
 .agents/skills/   Installed Claude Code skills (touying-author, typst-author)
 .github/          Release workflow: compiles slides.typ → PDF on tag push
 ```
 
 ---
 
-## Live demos
+## Live demos and workshop resources
 
-`demo/` holds Markdown files that are prompts *for Claude*, run live during the talk. The
-presenter points you at one (e.g. "run `demo/<NAME>.md`") and you follow its instructions -
-usually spinning up subagents and presenting their output on screen.
+The live-demo prompts and the participant starter-prompts now live in a sibling repository,
+`../intermediate-agentic-ai-resources/`:
 
-Run `ls demo/` to discover what is available; each file names and explains its own demo.
+- `demo/` holds Markdown files that are prompts *for Claude*, run live during the talk. The
+  presenter points you at one (e.g. "run `demo/<NAME>.md`") and you follow its instructions -
+  usually spinning up subagents and presenting their output on screen.
+- `01-properties/` ... `05-scaffold/` hold the starter prompts handed to participant teams to
+  brainstorm, get pushback, and develop their own skills/pipelines.
+
+Run `ls ../intermediate-agentic-ai-resources/` to discover what is available; each file names
+and explains its own purpose.
 
 ---
 
