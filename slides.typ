@@ -661,15 +661,15 @@ Four guiding questions:
   - The new capability (taking actions) is exactly the new risk
 ]
 
-= How to implement
+= How to build
 
 #focus-slide[
-  #text(size: 0.8em)[
+  #text(size: 1.6em)[
     "A complex system that works is invariably found to have evolved from a
     simple system that worked."
   ]
   #v(0.5em)
-  #text(size: 0.6em, fill: luma(180))[- John Gall, _Systemantics_ (1975)]
+  #text(size: 1em, fill: luma(180))[\- John Gall, _Systemantics_ (1975)]
 ]
 
 #speaker-note[
@@ -680,17 +680,43 @@ Four guiding questions:
 
 == A rough order of concerns
 
-#v(1fr)
-#align(center)[
-  #include "figures/build-order.typ"
-]
-#v(1fr)
-#align(center)[
-  #text(size: 0.9em, fill: luma(90))[
-    The order is *rough* - a failed test sends you back up the chain.
-  ]
-]
-#v(0.5em)
+#v(2em)
+#grid(
+  // 0.5em spacer on each side of each separator line (cols 1/2 and 4/5)
+  columns: (auto, 0.5em, 0.5em, 1fr, 0.5em, 0.5em, 1fr),
+  align: top,
+  grid.vline(x: 2, stroke: 0.5pt + luma(210)),
+  grid.vline(x: 5, stroke: 0.5pt + luma(210)),
+  align(center)[
+    #include "figures/build-order.typ"
+  ],
+  [], [],
+  [
+    #text(size: 0.85em, fill: luma(120), weight: "bold", tracking: 0.08em)[8 Problems]
+    #v(0em)
+    #for (i, name) in principle-names.enumerate() [
+      #pnum(i + 1, true) #h(0.2em) #name \
+      #v(-0.5em)
+    ]
+  ],
+  [], [],
+  [
+    #text(size: 0.85em, fill: luma(120), weight: "bold", tracking: 0.08em)[4 Patterns]
+    #v(0em)
+    #for (i, name) in (
+      [Pipeline],
+      [Fan-out],
+      [Routing / triage],
+      [Actor-critic],
+    ).enumerate() [
+      #pnum(i + 1, true) #h(0.2em) #name \
+      #v(-0.5em)
+    ]
+    #v(1fr)
+    #pad(0.5em, lblock[Assemble your own from the initial prompts!])
+  ],
+)
+#v(2em)
 
 #speaker-note[
   - Decide once, then live in the build loop; don't over-plan the architecture up front
@@ -698,7 +724,6 @@ Four guiding questions:
   - Gall's Law in practice: the working complex system grew from a working simple one
 ]
 
-= Let's Get Started
 
 #focus-slide[
   #grid(
