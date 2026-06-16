@@ -30,6 +30,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/download-artifact@v7
         with:
+          name: intermediate-agentic-ai-slides
           path: artifacts
       - name: Determine release tag
         id: tag
@@ -40,7 +41,7 @@ jobs:
             echo "name=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
           fi
       - name: Stage release assets
-        run: cp artifacts/intermediate-agentic-ai-slides/slides.pdf intermediate-agentic-ai-slides.pdf
+        run: cp artifacts/slides.pdf intermediate-agentic-ai-slides.pdf
       - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.tag.outputs.name }}
