@@ -309,6 +309,97 @@
   - The four properties are what the airframe buys; the engine alone gives none
 ]
 
+== Agents in the wild
+
+#grid(
+  columns: (1fr, 1fr),
+  rows: (auto, auto),
+  align: top,
+  gutter: 1em,
+  // Animation trick: grid.cell(x:, y:) lets us decouple layout position
+  // from source order. Touying processes #pause / #meanwhile in source
+  // order, so we list cells in the order we want them to appear:
+  //   1. copilot logo (subslide 1)
+  //   2. copilot bullets - #meanwhile rewinds it back to subslide 1,
+  //      so logo + bullets reveal together
+  //   3. #pause -> openclaw logo + bullets (subslide 2)
+  grid.cell(x: 0, y: 0, align: bottom, image("media/copilot.png", width: 90%)),
+  grid.cell(x: 0, y: 1)[
+    #meanwhile
+    - Started as inline autocomplete
+    - Now: *Copilot Workspace*
+      - fully hands-off agentic AI
+      - interact with it like a remote developer
+      - reads issues, fix the code, opens PRs
+      - reviews PRs for humans or AI
+
+    #v(1fr)
+    #similar[Claude Code, OpenAI Codex, OpenCode, Cursor]
+
+    #pause
+  ],
+  grid.cell(x: 1, y: 0, align: bottom, image("media/openclaw-logo-text-dark.png", width: 90%)),
+  grid.cell(x: 1, y: 1)[
+    - Personal AI agent
+    - Runs on your machine; triggered via *messaging apps*
+      (WhatsApp, Slack...)
+    - Can run shell commands, browse the web, read/write files, send email
+    - *Self-improving*: LLM writes and saves new skills for itself
+    - Open marketplace for new skills and tools
+    - MIT license, bring your own API key
+
+    #v(1fr)
+    #similar[KittenClaw, NVIDIA NemoClaw, Manus AI, BytePlus ArkClaw]
+  ],
+)
+
+== Two production agents
+
+#grid(
+  columns: (1fr, 1fr),
+  gutter: 1.5em,
+  align: top,
+  [
+    #box(baseline: 0.45em, image("media/jpmorgan.png", height: 1.6em)) #h(0.4em) #text(
+      weight: "bold",
+      size: 1.3em,
+    )[Ask D.A.V.I.D.]\
+    #text(size: 0.9em, fill: luma(100))[Multi-agent investment research]
+
+    #v(0.3em)
+    - *Supervisor* agent + *specialist* sub-agents \
+      (SQL, RAG, analytics)
+    - Human advisor *reviews every output* before it reaches a client
+    - \~95% reduction in research time
+
+    #v(1fr)
+    #similar[Morgan Stanley AI Assistant, Goldman GS AI, DBS Joy]
+  ],
+  [
+    #image("media/hippocratic.png", height: 2cm)
+    #v(0em)
+    #text(size: 0.9em, fill: luma(100))[Voice agents for healthcare]
+
+    #v(0.3em)
+    - Post-discharge follow-up, medication walkthroughs
+    - 180M+ patient interactions; *0 reported severe-harm events*
+    - "Polaris" safety architecture, validated by 7,500+ clinicians
+    - *Scope is the alignment* --- never diagnoses, only educates
+
+    #v(1fr)
+    #similar[Abridge, Suki, Nuance DAX Copilot]
+  ],
+)
+
+#speaker-note[
+  - Two production agents, two patterns
+  - Ask David: supervisor + specialists + HITL - exactly what students will build today
+  - Hippocratic: alignment by *scope*, not by post-hoc guardrails - low blast radius is a design choice
+  - Tie back to designing for imperfect agents
+]
+
+
+= Common workflow patterns
 
 == Why can't we just use ONE agent?
 
@@ -345,9 +436,6 @@ One big agent fails in ways you can't see, fix, or contain.
   - Cost & latency: a frontier model burns tokens on trivial fetches.
   Each failure maps to one principle - and each is fixed by splitting the work, which is the next section.
 ]
-
-
-= Common workflow patterns
 
 == Pattern 1: Pipeline, not one mega-agent
 
@@ -610,13 +698,14 @@ Four guiding questions:
   column-gutter: 1.5em,
   align: (top, top),
   [
-    #text(size: 1.4em)[
-
+    #v(1fr)
+    #lblock(inset: 0em, outset: 0.5em)[#text(size: 1.4em)[
       An *eval* is a *repeatable measurement* of whether your agent did the right thing on a *known set of inputs*.
-    ]
+    ]]
     #pause
-    #v(0.6em)
-    An eval is what gives you the confidence to *change* your agent. Without it, how do you know your next prompt tweak hasn't broken something?
+    #v(1fr)
+    An eval is what gives you the confidence to *change* your agent. Without it, how do you know your tweak didn't break something?
+    #v(1fr)
   ],
   [
     #pause
@@ -738,6 +827,190 @@ Four guiding questions:
   - The new capability (taking actions) is exactly the new risk
 ]
 
+---
+
+#grid(
+  columns: (1fr, auto),
+  align: horizon,
+  gutter: 2em,
+  [
+    *Meta's director of AI alignment lost her emails.*
+    #v(1em)
+    _I had to run to my Mac mini like I was defusing a bomb._
+
+    #align(right)[-- Summer Yue]
+  ],
+  image("media/meta_email.png", height: 100%),
+)
+
+---
+
+#grid(
+  columns: (1fr, 1fr),
+  gutter: 1.5em,
+  align: top,
+  [
+    #image("media/klarna.png", height: 2cm)
+    #v(0em)
+    #text(size: 0.9em, fill: luma(100))[Customer support that went "too far"]
+
+    #v(0.3em)
+    - Feb 2024: claimed work of *700 reps*,
+      - \$40M profit boost
+    - Quality decayed on disputes, fraud, bereavement
+    - May 2025: CEO walked it back
+      - _"we went too far"_
+      - _"what you end up having is lower quality,"_
+
+
+    #v(1fr)
+    #similar[Intercom Fin, Decagon, Sierra, Salesforce Agentforce]
+  ],
+  [
+    #image("media/sakana.svg", height: 2cm)
+    #v(0em)
+    #text(size: 0.9em, fill: luma(100))[AI Scientist caught specification gaming]
+
+    #v(0.3em)
+    - Autonomous research agent --- writes, runs, evaluates experiments
+    - Exploited its *eval sandbox* to skip correctness checks
+    - Edited its own runtime to *extend timeouts*
+    - Did *exactly what was measured*
+
+    #v(1fr)
+    #similar[OpenAI o1 oversight evasion (Apollo), GPT-4 TaskRabbit CAPTCHA, Anthropic reward-hacking studies]
+  ],
+)
+
+#speaker-note[
+  - Two real-world specification-gaming stories
+  - Klarna: the triage-bot warning slide, named brand
+  - Sakana: textbook reward hacking - agent literally rewrote its own eval
+  - Both reinforce: the metric you measure becomes the goal the agent pursues
+]
+
+= Comparable tech,\ magic built-in
+
+== Agent design frameworks
+
+#grid(
+  columns: (7fr, 3fr),
+  rows: (1fr,),
+  gutter: 1em,
+  align: horizon,
+  block(
+    width: 100%,
+    height: 100%,
+  ),
+  [
+    #v(1em)
+    #text(
+      weight: "bold",
+      size: 1.3em,
+    )[LangFlow]
+
+    Design agents visually as *graphs of components* --- or as code.
+
+    #v(1fr)
+    #similar[LangGraph, Flowise, AutoGen, CrewAI, n8n, Dify, LlamaIndex Workflows\
+      #only("2-")[ *PowerAutomate*]~]
+  ],
+)
+#place(right + horizon, dx: -8.5cm, image("media/langflow.png", height: 100%))
+
+
+#speaker-note[
+  - Visual editors let non-coders compose agents
+  - Code frameworks (LangGraph, AutoGen, CrewAI) for serious work
+  - Same complexity-ladder warning: drag-and-drop != free pass on evals
+]
+
+// Full-bleed image slide: drop the right + bottom margins via slide config
+// (a mid-slide `#set page` would inject a blank page in touying).
+== Dynamic agent workflows
+#slide(
+  config: config-page(margin: (top: 3em, bottom: 0pt, left: 2em, right: 0pt)),
+)[
+  // `overlap`: width of the text box. Raise it to extend the text rightward
+  // over the image; lower it to pull the text back to the left.
+  #let overlap = 7cm
+  #box(width: 100%, height: 100%)[
+    #place(right + horizon, image("media/whatsapp-1.jpeg", height: 100%))
+    #place(left + top, dy: 1em, box(width: overlap, text(
+      size: 1.8em,
+      weight: "bold",
+    )[This is Anthropic's idea of the future.]))
+  ]
+
+  #speaker-note[
+    - Agent teams (left): a few agents talk peer-to-peer
+    - Dynamic workflows (right): one orchestrator fans out to N tasks - implementer -> verifiers -> fixer - then returns when done
+    - N can be in the hundreds: this is the autonomous end of the complexity ladder
+  ]
+]
+
+// Full-bleed image slide: drop the right + bottom margins via slide config
+// (a mid-slide `#set page` would inject a blank page in touying).
+#slide(
+  config: config-page(margin: (top: 3em, bottom: 0pt, left: 2em, right: 0pt)),
+)[
+  // `overlap`: width of the text box. Raise it to extend the text rightward
+  // over the image; lower it to pull the text back to the left.
+  #let overlap = 7cm
+  #box(width: 100%, height: 100%)[
+    #place(right + horizon, image("media/whatsapp-2.jpeg", height: 100%))
+    #place(left + top, dy: 1em, box(width: overlap, text(
+      size: 1.8em,
+      weight: "bold",
+    )[This is Anthropic's idea of the future.
+
+      #emph[Maybe].]))
+  ]
+
+  #speaker-note[
+    - Same diagram, now with the price tag attached
+    - Every box is a model call; fan-out multiplies token spend fast
+    - The fat cat got rich on your bill - budget and cap autonomous runs before you let them loose
+  ]
+]
+
+== Self-evolving swarms
+
+#grid(
+  columns: (1.4fr, 1fr),
+  gutter: 1.2em,
+  align: horizon,
+  [
+    *Swarming*: a new bet on where frontier capability comes from.
+    - Not one giant model, but a *swarm of smartphone-grade models* working together.
+    - The swarm thinks, verifies, and rewrites itself
+    - The problem is recursively broken down and argued in smaller and smaller blocks instead of one big forward pass.
+    - Typically reach _hundreds_ of agents per query.
+    - They call this _Causal discovery + self-evolution_.
+
+    #v(0.5em)
+    #gblock[
+      *The wager:* many small models that argue and audit each other vs workflows of expensive models.
+    ]
+  ],
+  [
+    #block(stroke: 0.5pt + luma(180), radius: 0.3em, clip: true, outset: 0.4em, fill: rgb("#FAFCFE"), image(
+      "media/apodex.png",
+      width: 100%,
+    ))
+    #place(bottom + right)[
+      #text(size: 0.7em, fill: luma(110))[apodex.com --- _Apodex 1.0_, 2026]
+    ]
+  ],
+)
+
+#speaker-note[
+  - This is speculative - a "coming strategy", not a shipped consensus
+  - Contrast with the Anthropic "fan-out one big model" picture two slides back
+  - Apodex's pitch: structural certainty, not statistical - output is auditable/traceable
+  - Open question for the room: does many-small-models-arguing actually beat one-big-model? Nobody knows yet
+]
+
 = How to build
 
 #focus-slide[
@@ -790,7 +1063,15 @@ Four guiding questions:
       #v(-0.5em)
     ]
     #v(1fr)
-    #pad(0.5em, lblock[Assemble your own from the initial prompts!])
+    #pad(0.5em, lblock[
+      #align(center)[
+        #qrcode("https://manek.sg/intmd-1", width: 4.5cm)
+        #v(-0.8em)
+        #text(font: "DejaVu Sans Mono", size: .8em)[
+          manek.sg/intmd-1
+        ]
+      ]
+    ])
   ],
 )
 #v(2em)
@@ -824,9 +1105,8 @@ Four guiding questions:
   )
 ]
 
-= Sources & further reading
 
-== Resources
+== Sources & further reading
 
 Agent-building:
 
