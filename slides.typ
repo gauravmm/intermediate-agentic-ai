@@ -174,10 +174,87 @@
 
 #title-slide()
 
-// ============================================================================
-// DRAFT. Content dumped from spec/CONTENT.md, organised by topic. Not arranged
-// for flow or density yet. Graphic proposals are marked with #gfx[...].
-// ============================================================================
+
+== About Me <touying:hidden>
+
+#grid(
+  columns: (1fr, 2fr),
+  gutter: 2em,
+  align(center + horizon)[
+    #block(
+      radius: 0.5em,
+      clip: true,
+    )[
+      #image("media/portrait.jpg", width: 100%, height: 120mm)
+    ]
+  ],
+  align(horizon)[
+    #text(weight: "bold", size: 12mm)[Dr. Gaurav Manek]
+    #v(0.3em)
+    - *PhD* in AI/ML --- Carnegie Mellon University
+    #v(0.1em)
+    - Founder, *Ocellivision* @ A\*STAR
+    #v(0.1em)
+    - Founder, *Visigoth.ai* (SaaS)
+    #v(0.1em)
+    - Research Scientist, IMCB, A\*STAR
+    #v(1em)
+
+    #text(size: 0.85em, fill: luma(100))[
+      Opinions here are my own, not my employers'
+
+      For consulting: #link("mailto:gaurav@gauravmanek.com")[gaurav\@gauravmanek.com]
+    ]
+  ],
+)
+
+
+= Outline <touying:hidden>
+
+#grid(
+  columns: (2fr, 0.1em, 1fr),
+  gutter: 1em,
+  grid.vline(x: 1, stroke: 0.5pt + luma(220), position: end),
+  [
+    #principle(1, [How to think about agents], [What an agent is, and why one is rarely enough.])
+    #v(-0em)
+    #principle(2, [Common workflow patterns], [Pipeline, fan-out, routing, actor-critic.])
+    #v(-0em)
+    #principle(3, [Rules for individual agents], [One job, clean handoffs, tools, observability.])
+    #v(-0em)
+    #principle(4, [Agent safety & governance], [Least privilege; agents that act in the real world.])
+    #v(-0em)
+    #principle(5, [How to build], [A rough order of concerns - then build your own.])
+    #v(-0em)#pause
+    #lblock(inset: (left: 0em, right: 0em), outset: (left: 1em, right: 0em, top: 0.6em, bottom: 0.6em))[
+      #principle(6, [Build Time], [Hands-on building, ending in a 5 minute demo.])
+    ]
+  ],
+  [],
+  text(size: 0.92em)[
+    *Absolutely _Zero_ Magic*
+    - IDE agent on your laptop - not langchain, not the ChatGPT web app.
+    - Portable skills, independent of any framework's magic.
+    - Corporate ChatGPT only where data rules force it.
+
+    #pause
+    *Before we begin*
+    - Frontier-model account working in your IDE.
+    - Non-sensitive data loaded.
+    - Team agrees on the problem.
+  ],
+)
+
+
+#speaker-note[
+  - Sell "Zero Magic": frameworks hide the moving parts; here we work close to the
+    metal so the skills transfer to *any* stack.
+  - IDE agent, not the web app - we need tools, files, and the loop in view.
+  - Corporate ChatGPT only where data policy forces it; not the default.
+  - Then run the before-we-begin checklist: account works, safe data loaded,
+    team aligned on the problem before anyone writes a prompt.
+]
+
 = How to think about agents
 
 == Where we're starting from
